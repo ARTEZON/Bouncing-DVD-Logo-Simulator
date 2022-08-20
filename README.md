@@ -4,7 +4,7 @@
 - Customizable logo speed and size
 - Windowed/fullscreen mode
 - Stats overlay with corner hit count
-- Ability to spawn several logos with collision
+- Ability to spawn multiple logos with collision
 - Random colors & color change at bounce (if enabled)
 
 \
