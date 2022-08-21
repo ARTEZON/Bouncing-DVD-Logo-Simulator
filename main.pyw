@@ -34,7 +34,15 @@ fullscreen = START_FULLSCREEN
 screen = pygame.display.set_mode((screen_w, screen_h), pygame.RESIZABLE)
 pygame.display.set_caption("DVD")
 
-image = pygame.image.load(LOGO_IMAGE_FILE).convert_alpha()
+try:
+    image = pygame.image.load(LOGO_IMAGE_FILE).convert_alpha()
+except FileNotFoundError:
+    image = pygame.surface.Surface((300, 150))
+    image.fill((255, 255, 255))
+    error = [['ERROR', 50, 20], ['File LOGO_IMAGE_FILE', 22, 80], ['not found', 22, 112]]
+    for line in error:
+        font = pygame.font.Font(pygame.font.get_default_font(), line[1])
+        image.blit(font.render(line[0], True, (0, 0, 0)), ((image.get_width() - font.size(line[0])[0]) // 2, line[2]))
 
 logos = []
 logos_count = 0
