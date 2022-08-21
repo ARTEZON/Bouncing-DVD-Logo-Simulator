@@ -79,8 +79,9 @@ class Logo(pygame.sprite.Sprite):
         self.pos.x += x_offset
         self.pos.y += y_offset
         self.rect = pygame.Rect(self.pos.x, self.pos.y, self.w, self.h)
-        self.image = pygame.transform.smoothscale(image, self.rect.size)
-        if self.color: fill_logo(self.image, self.color)
+        self.raw_image = pygame.transform.smoothscale(image, self.rect.size)
+        self.image = self.raw_image.copy()
+        if self.color: self.image = fill_logo(self.raw_image, self.color)
 
     def change_speed(self, x, y):
         x_sign = -1 if self.velocity.x < 0 else 1
@@ -91,7 +92,7 @@ class Logo(pygame.sprite.Sprite):
     
     def set_color(self, color):
         self.color = color
-        fill_logo(self.image, self.color)
+        self.image = fill_logo(self.raw_image, self.color)
 
 
 class CornerHitMessage():
@@ -254,22 +255,13 @@ def object_collision(tolerance_x, tolerance_y):
                     first.set_color((random.randint(50, 250), random.randint(50, 250), random.randint(50, 250)))
                     second.set_color((random.randint(50, 250), random.randint(50, 250), random.randint(50, 250)))
 
-def fill_logo(surface, color=None, mask_color=None):
+def fill_logo(surface, color):
     w, h = surface.get_size()
-    if color:
-        new_r, new_g, new_b = color
-        for x in range(w):
-            for y in range(h):
-                r, g, b, a = surface.get_at((x, y))
-                if not mask_color or (r, g, b) == mask_color:
-                    surface.set_at((x, y), pygame.Color(new_r, new_g, new_b, a))
-    else:
-        scaled_image = pygame.transform.smoothscale(image, (w, h))
-        for x in range(w):
-            for y in range(h):
-                r, g, b, a = surface.get_at((x, y))
-                if not mask_color or (r, g, b) == mask_color:
-                    surface.set_at((x, y), scaled_image.get_at((x, y)))
+    tint_surf = pygame.surface.Surface((w, h))
+    tint_surf.fill(color)
+    new_surf = surface.copy()
+    new_surf.blit(tint_surf, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+    return new_surf
 
 def toggle_fullscreen(enable):
     global screen, fullscreen, screen_w, screen_h
